@@ -862,11 +862,25 @@ footer a:hover{color:var(--gold)}
     try{ if (typeof window.gtag === 'function') gtag('event', name, params); }catch(e){}
   }
 
-  /* Envio das respostas — PRODUÇÃO: ligar ao Web App do Google Apps Script, CRM ou webhook.
-     Exemplo: return fetch('URL_DO_WEBHOOK', {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); */
+  /* Envio para a planilha "Mario Condes | Diagnóstico" (Web App do Google Apps Script).
+     Cole em PLANILHA_URL a URL do app da Web (termina em /exec). Vazio = não envia. */
+  var PLANILHA_URL = 'https://script.google.com/macros/s/AKfycby-cX6fXaxkICS5F0RNYHqVR_-EiBUJBzrWF-hKvMdYQOSYVucn_uxrpD-y_vDeg7d-/exec';
+  function origemLP(){
+    var o = {pagina: location.origin + location.pathname};
+    try{
+      var q = new URLSearchParams(location.search);
+      ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k){ if (q.get(k)) o[k] = q.get(k); });
+    }catch(e){}
+    return o;
+  }
   function enviarRespostas(payload){
+    payload = Object.assign(origemLP(), payload);
     window.__diagnosticoCONDES = payload;
-    return Promise.resolve();
+    if (!PLANILHA_URL) return Promise.resolve();
+    try{
+      return fetch(PLANILHA_URL, {method:'POST', mode:'no-cors', keepalive:true,
+        headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)}).catch(function(){});
+    }catch(e){ return Promise.resolve(); }
   }
 
   function checkoutUrl(pos){
@@ -942,6 +956,7 @@ footer a:hover{color:var(--gold)}
     var keep = draft && draft.A && draft.A.email === v;
     A = keep ? draft.A : {};
     A.email = v;
+    enviarRespostas({etapa:'inicio', email:v});
     track('diagnostico_inicio', {retomado:!!keep});
     show('quiz');
     go(keep ? Math.min(draft.step, N-1) : 0, 1);
@@ -1305,7 +1320,7 @@ footer a:hover{color:var(--gold)}
     }); });
 
     if (!demo){
-      var payload = Object.assign({}, A, {indice:R.index, nivel:R.level.name, pilares:PILLARS.reduce(function(o,p,i){ o[p.name] = R.scores[i]; return o; }, {}), enviado_em:new Date().toISOString()});
+      var payload = Object.assign({}, A, {etapa:'concluido', indice:R.index, nivel:R.level.name, pilares:PILLARS.reduce(function(o,p,i){ o[p.name] = R.scores[i]; return o; }, {}), enviado_em:new Date().toISOString()});
       enviarRespostas(payload);
       track('generate_lead', {origem:'diagnostico_condes'});
       track('diagnostico_concluido', {indice:R.index, nivel:R.level.name, pilar_prioritario:wp.name, whatsapp_autorizado:wa});
