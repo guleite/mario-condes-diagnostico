@@ -688,7 +688,7 @@ footer a:hover{color:var(--gold)}
             <div class="big-p"><b>R$ 49,90</b><span>à vista</span></div>
             <p class="alt">ou <b>12x de R$ 5,16</b> · menos de <b>R$ 1,70 por dia</b> durante um mês</p>
           </div>
-          <a class="btn btn-gold" data-cta="resultado-oferta" href="https://pay.hotmart.com/V108538792P" target="_blank" rel="noopener">Quero transformar minha vida financeira por R$ 49,90</a>
+          <a class="btn btn-gold" data-cta="resultado-oferta" href="https://pay.hotmart.com/V108538792P?checkoutMode=10&amp;bid=1795028839024&amp;fromExitPopup=true" target="_blank" rel="noopener">Quero transformar minha vida financeira por R$ 49,90</a>
           <div class="pay">
             <span><svg aria-hidden="true"><use href="#i-lock"/></svg>Compra segura na Hotmart</span>
             <span><svg aria-hidden="true"><use href="#i-device"/></svg>E-book com acesso imediato</span>
@@ -736,7 +736,7 @@ footer a:hover{color:var(--gold)}
   'use strict';
 
   /* ================= Configuração ================= */
-  var CHECKOUT = 'https://pay.hotmart.com/V108538792P';
+  var CHECKOUT = 'https://pay.hotmart.com/V108538792P?checkoutMode=10&bid=1795028839024&fromExitPopup=true';
   var PRODUCT = {item_id:'V108538792P', item_name:'Servidor Público Rumo à Liberdade Financeira', price:49.90, currency:'BRL'};
   var DRAFT_KEY = 'condes-diagnostico-v1';
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -890,7 +890,7 @@ footer a:hover{color:var(--gold)}
       ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','fbclid','gclid'].forEach(function(k){ if (q.get(k)) out.set(k, q.get(k)); });
     }catch(e){}
     out.set('sck', 'lp_diagnostico_' + pos);
-    return CHECKOUT + '?' + out.toString();
+    return CHECKOUT + (CHECKOUT.indexOf('?') > -1 ? '&' : '?') + out.toString();
   }
   function wireCTAs(){
     document.querySelectorAll('[data-cta]').forEach(function(a){ a.href = checkoutUrl(a.getAttribute('data-cta')); });
